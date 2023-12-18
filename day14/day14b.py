@@ -67,12 +67,20 @@ for line_index, line in enumerate(lines):
         break
     rock_rows.append(list(line))
 
-for i in range(0, 1000000000):
-    print(f"{i} {compute_weight(rock_rows)}")
-    backup_rock_rows = [[x for x in line] for line in rock_rows]
-    perform_spin_cycle(rock_rows)
-    if rock_rows == backup_rock_rows:
-        break
+indices = []
+weights = []
 
-print(rock_rows)
-print(compute_weight(rock_rows))
+for i in range(0, 300):
+    weight = compute_weight(rock_rows)
+    print(f"{i} {weight}")
+    indices.append(i)
+    weights.append(weight)
+    perform_spin_cycle(rock_rows)
+
+# by inspection, we seem to reach a max of 103021 at 227 and again at 269
+# this seems to be after we have settled to a steady state
+# so the period is 42 cycles
+# this suggests the value after 1 billion cycles is the same as the value at index 244
+# (1e9 % 42 + 5 * 42)
+
+print(weights[244])
