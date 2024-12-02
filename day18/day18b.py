@@ -71,16 +71,21 @@ class AxisAlignedLoop:
     def compute_area(self):
         list.sort(self.line_segments)
         current_x_coord = min(self.line_segments[0].xs)
+
+        print(self.line_segments)
+        print(current_x_coord)
         # these are always disjoint
-        active_y_ranges: List[Tuple[int, int]] = [self.line_segments[0].ys]
-        area_so_far = 1 + self.line_segments[0].ys[1] - self.line_segments[0].ys[0]
-        for line_segment in self.line_segments[1:]:
+        active_y_ranges: List[Tuple[int, int]] = []
+        area_so_far = 0
+        for line_segment in self.line_segments:
             assert not line_segment.horizontal
 
             # if this line segment intersects with an active range
             # it might expand it, contract it, or split it in two
             # note it's possible that after expanding, two ranges will be adjacent
             # in this case they should be combined after
+
+            print(f"{current_x_coord} {line_segment.xs[0]} {line_segment.xs[0] - current_x_coord}")
 
             found_match = False
             next_y_ranges = []
@@ -98,8 +103,10 @@ class AxisAlignedLoop:
                 # expansion
                 if line_segment.ys[1] == range[0]:
                     next_y_ranges.append((line_segment.ys[0], range[1]))
+                    area_so_far += line_segment.ys[1] - line_segment.ys[0]
                 elif line_segment.ys[0] == range[1]:
                     next_y_ranges.append((range[0], line_segment.ys[1]))
+                    area_so_far += line_segment.ys[1] - line_segment.ys[0]
                 # contraction
                 elif line_segment.ys[0] == range[0] and line_segment.ys[1] == range[1]:
                     pass # don't append anything, this range should be deleted
@@ -112,7 +119,7 @@ class AxisAlignedLoop:
                     next_y_ranges.append((range[0], matched_part[0]))
                     next_y_ranges.append((matched_part[1], range[1]))
             
-            print(f"{area_so_far} {line_segment.ys} : {active_y_ranges}")
+            print(f"{area_so_far} {current_x_coord} {line_segment.ys} : {active_y_ranges}")
 
             #if area_so_far > 1000000000000:
             #    exit(0)
@@ -144,11 +151,17 @@ class AxisAlignedLoop:
 
         return area_so_far
 
-# f = open("day18-input.txt")
-f = open("day18-test.txt")
+f = open("day18-input.txt")
+# f = open("day18-test.txt")
+# f = open("day18-test2.txt")
+# f = open("day18-test3.txt")
 all_lines = f.readlines()
 all_segments = [Segment(line) for line in all_lines if len(line) > 0]
+
+# print(all_segments)
 
 loop = AxisAlignedLoop(all_segments)
 area = loop.compute_area()
 print(area)
+
+print(952408144115 - area)
